@@ -15,6 +15,10 @@
 #include "leveldb/table.h"
 #include "port/port.h"
 
+/** NOTE:Table缓存
+ * SSTable的文件名类似于000005.ldb,前缀部分就是一个file_number,Table就是用这个file_number作为键来缓存的.
+ * Table的缓存存储在TableCache类里面
+ */
 namespace leveldb {
 
 class Env;

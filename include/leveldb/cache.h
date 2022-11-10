@@ -23,6 +23,9 @@
 #include "leveldb/export.h"
 #include "leveldb/slice.h"
 
+/** NOTE:缓存接口
+ * 缓存有一个接口Cache,每个缓存需要实现这个接口,主要操作包括Insert、Lookup和Erase.
+ */
 namespace leveldb {
 
 class LEVELDB_EXPORT Cache;

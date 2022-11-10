@@ -12,8 +12,13 @@
 
 #include "leveldb/slice.h"
 #include "leveldb/status.h"
+
 #include "port/port.h"
 
+/** NOTE:文件操作
+ * db/filename.h
+ * db/filename.cc:存储文件类型、生成和解析
+ */
 namespace leveldb {
 
 class Env;

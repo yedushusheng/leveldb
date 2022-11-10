@@ -7,6 +7,9 @@
 
 #include "leveldb/status.h"
 
+/** NOTE:生成SSTable文件接口
+ * db/build.h 
+ * db/build.cc：根据一个Iterator生成一个SSTable文件 */
 namespace leveldb {
 
 struct Options;

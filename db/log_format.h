@@ -8,6 +8,12 @@
 #ifndef STORAGE_LEVELDB_DB_LOG_FORMAT_H_
 #define STORAGE_LEVELDB_DB_LOG_FORMAT_H_
 
+/** NOTE:WAL
+ * db/log_format.h: 定义了RecordType和一些常量
+ * db/log_writer.h db/log_writer.cc:
+ * 主要实现Writer::AddRecord,写一条记录到日志中 db/log_reader.h
+ * db/log_reader.cc: 主要实现Reader::ReadRecord,读取一条日志记录
+ */
 namespace leveldb {
 namespace log {
 

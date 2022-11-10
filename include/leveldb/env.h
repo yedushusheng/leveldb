@@ -39,6 +39,13 @@
 #endif  // defined(DeleteFile)
 #endif  // defined(_WIN32)
 
+/** NOTE:LevelDB是一个数据库函数库,数据库总是需要操作文件和线程,这就需要做很多系统调用.
+ * 各个操作系统的系统调用方式不一样,为了跨平台支持,LevelDB对这些系统调用做了一层封装,提供了统一的接口来操作,并且提供了Posix和Windows两种实现,
+ * 如果需要实现其他的系统,只需要根据系统实现相应的Env即可.
+ * Posix通过文件env_posix.cc和posix_logger.h两个文件来实现;
+ * Wondows通过文件env_windows.cc和windows_logger.h两个文件来实现;
+ * 通过cmake来选择相应的实现。
+*/
 namespace leveldb {
 
 class FileLock;

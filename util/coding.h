@@ -17,6 +17,9 @@
 #include "leveldb/slice.h"
 #include "port/port.h"
 
+/** NOTE:编码
+ * 内存里的整数和字符串是怎么存储到磁盘上的
+*/
 namespace leveldb {
 
 // Standard Put... routines append to a string

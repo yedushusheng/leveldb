@@ -9,6 +9,12 @@
 
 #include "leveldb/export.h"
 
+/** NOTE:
+ * Options定义打开数据库的选项;
+ * ReadOptions定义读操作相关的选项;
+ * WriteOptions定义写操作相关的选项.
+ * 这些选项就是简单的属性.
+*/
 namespace leveldb {
 
 class Cache;

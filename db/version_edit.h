@@ -11,6 +11,12 @@
 
 #include "db/dbformat.h"
 
+/** NOTE:版本管理
+ * version_edit.h
+ * version_edit.cc: 实现VersionEdit
+ * version_set.h
+ * version_set.cc：实现Version、VersionSet和Builder
+*/
 namespace leveldb {
 
 class VersionSet;

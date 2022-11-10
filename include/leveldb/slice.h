@@ -22,6 +22,7 @@
 
 #include "leveldb/export.h"
 
+/** NOTE:LevelDB对于字符串的封装类 */
 namespace leveldb {
 
 class LEVELDB_EXPORT Slice {

@@ -19,6 +19,10 @@
 #include "leveldb/options.h"
 #include "leveldb/status.h"
 
+/** NOTE:
+ * include/leveldb/table_builder.h 
+ * table/table_builder.cc：不断添加键值对,逐渐构建一个Table
+ * */
 namespace leveldb {
 
 class BlockBuilder;

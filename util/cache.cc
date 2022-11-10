@@ -13,6 +13,7 @@
 #include "util/hash.h"
 #include "util/mutexlock.h"
 
+/** NOTE:LRUCache实现 */
 namespace leveldb {
 
 Cache::~Cache() {}

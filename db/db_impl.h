@@ -18,6 +18,10 @@
 #include "port/port.h"
 #include "port/thread_annotations.h"
 
+/** NOTE:Compaction
+ * Version_set.h version_set.cc: Compaction类的实现,更新Compaction的统计信息,确定Compaction的内容
+ * db_impl.h db_impl.cc: Compaction实际操作的实现
+*/
 namespace leveldb {
 
 class MemTable;

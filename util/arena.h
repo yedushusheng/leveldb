@@ -11,6 +11,9 @@
 #include <cstdint>
 #include <vector>
 
+/** NOTE:内存管理
+ *
+ */
 namespace leveldb {
 
 class Arena {

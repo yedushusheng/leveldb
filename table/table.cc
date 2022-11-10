@@ -15,6 +15,12 @@
 #include "table/two_level_iterator.h"
 #include "util/coding.h"
 
+/** NOTE: DataBlock 
+ * include/leveldb/cache.h: 定义Cache接口
+ * util/cache.cc: 实现LRU缓存
+ * table/table.cc: 读取Data Block时使用缓存
+ * db/table_cache.cc：实现一个Table结构的缓存
+*/
 namespace leveldb {
 
 struct Table::Rep {

@@ -19,6 +19,7 @@
 #include "leveldb/export.h"
 #include "leveldb/slice.h"
 
+/** NOTE:Status定义很多操作的返回码,很多操作需要通过返回的status来判断下一步的行为.*/
 namespace leveldb {
 
 class LEVELDB_EXPORT Status {

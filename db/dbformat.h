@@ -17,6 +17,11 @@
 #include "util/coding.h"
 #include "util/logging.h"
 
+/** NOTE:定义了Internal Key、Lookup Key、InternalKeyComparator和InternalFilterPolicy
+ * User Key是用户提供的键,是我们看到的键;
+ * Internal Key是实际存储的键,支持版本号和Tag的功能;
+ * Lookup Key则是为了查找MemTable而构造的键.
+*/
 namespace leveldb {
 
 // Grouping of constants.  We may want to make some of these

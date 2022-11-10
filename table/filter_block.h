@@ -15,8 +15,15 @@
 #include <vector>
 
 #include "leveldb/slice.h"
+
 #include "util/hash.h"
 
+/** NOTE:
+ * table/filter_block.h
+ * table/filter_block.cc
+ * include/leveldb/filter_policy.h
+ * util/bloom.cc: 构建布隆过滤器数据,判断键是否存在的
+ */
 namespace leveldb {
 
 class FilterPolicy;

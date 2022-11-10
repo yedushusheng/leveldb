@@ -10,6 +10,10 @@
 #include "leveldb/export.h"
 #include "leveldb/iterator.h"
 
+/** NOTE:
+ * include/leveldb/table.h 
+ * table/table.cc：读取一个Table的内容,产生迭代器,或者根据一个键读取一个值
+*/
 namespace leveldb {
 
 class Block;

@@ -9,6 +9,14 @@
 
 #include "leveldb/export.h"
 
+/** NOTE:LevelDB是一个SortedMap,既然是一个SortedMap,键与键的顺序肯定是要有一个比较的规则.
+ * 有很多的比较规则:
+ * 基于二进制字节序的比较;
+ * 基于某个字符集的比较;
+ * 基于某个字符集不区分大小写的比较;
+ * ...
+ * LevelDB没有规定比较的规则,只是定义了一个Comparator接口,用户可以提供自己的规则实现这个接口.
+*/
 namespace leveldb {
 
 class Slice;
