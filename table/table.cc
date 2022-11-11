@@ -19,6 +19,7 @@
  * include/leveldb/cache.h: 定义Cache接口
  * util/cache.cc: 实现LRU缓存
  * table/table.cc: 读取Data Block时使用缓存
+ * 读取一个Table的内容,产生迭代器,或者根据一个键读取一个值
  * db/table_cache.cc：实现一个Table结构的缓存
 */
 namespace leveldb {

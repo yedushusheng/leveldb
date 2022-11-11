@@ -16,6 +16,9 @@
 #include "util/coding.h"
 #include "util/crc32c.h"
 
+/** NOTE:
+ * table/table_builder.cc：不断添加键值对,逐渐构建一个Table
+*/
 namespace leveldb {
 
 struct TableBuilder::Rep {

@@ -11,7 +11,8 @@
 #include "leveldb/slice.h"
 
 /** NOTE:
- * table/block_builder.h table/block_builder.cc: 不断添加键值对,逐渐构建一个Block,
+ * table/block_builder.h 
+ * table/block_builder.cc: 不断添加键值对,逐渐构建一个Block,
  * 主要是添加键值对,然后生成Block的数据
 */
 namespace leveldb {

@@ -13,7 +13,9 @@
 #include "leveldb/table_builder.h"
 
 /** NOTE:
- * table/format.h table/format.cc: 编解码BlockHandler,编解码Footer,根据BlockHandler读取一个键的内容
+ * table/format.h 
+ * table/format.cc: 编解码BlockHandler,编解码Footer,
+ * 根据BlockHandler读取一个键的内容
 */
 namespace leveldb {
 

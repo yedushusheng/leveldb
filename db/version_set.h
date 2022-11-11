@@ -29,6 +29,7 @@
  * version_edit.cc: 实现VersionEdit
  * version_set.h
  * version_set.cc：实现Version、VersionSet和Builder
+ * Compaction类的实现,更新Compaction的统计信息,确定Compaction的内容
 */
 namespace leveldb {
 

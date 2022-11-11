@@ -4,14 +4,6 @@
 
 #include "db/db_impl.h"
 
-#include <algorithm>
-#include <atomic>
-#include <cstdint>
-#include <cstdio>
-#include <set>
-#include <string>
-#include <vector>
-
 #include "db/builder.h"
 #include "db/db_iter.h"
 #include "db/dbformat.h"
@@ -22,11 +14,20 @@
 #include "db/table_cache.h"
 #include "db/version_set.h"
 #include "db/write_batch_internal.h"
+#include <algorithm>
+#include <atomic>
+#include <cstdint>
+#include <cstdio>
+#include <set>
+#include <string>
+#include <vector>
+
 #include "leveldb/db.h"
 #include "leveldb/env.h"
 #include "leveldb/status.h"
 #include "leveldb/table.h"
 #include "leveldb/table_builder.h"
+
 #include "port/port.h"
 #include "table/block.h"
 #include "table/merger.h"
@@ -178,13 +179,22 @@ DBImpl::~DBImpl() {
   }
 }
 
+/** NOTE:可以看到DBImpl::NewDB非常简单,就是创建一个MANIFEST文件,将以下信息写入到MANIFEST文件:
+ * 比较器名称;
+ * 当前日志的编号;
+ * 下一个使用的文件编号;
+ * 上一个使用的SequenceNumber;
+ * 最后CURRENT指向新创建的MANIFEST文件.
+ * */
 Status DBImpl::NewDB() {
   VersionEdit new_db;
+  // NOTE:保存比较器的名称，下次打开时需要用相同的名称打开
   new_db.SetComparatorName(user_comparator()->Name());
-  new_db.SetLogNumber(0);
-  new_db.SetNextFile(2);
+  new_db.SetLogNumber(0); // NOTE:分配日志文件的编号为0
+  new_db.SetNextFile(2);  // NOTE:下一个待分配的文件编号是2,因为1分配给了MANIFEST文件
   new_db.SetLastSequence(0);
 
+  // NOTE:创建MANIFEST文件，将VersionEdit写入
   const std::string manifest = DescriptorFileName(dbname_, 1);
   WritableFile* file;
   Status s = env_->NewWritableFile(manifest, &file);
@@ -205,6 +215,7 @@ Status DBImpl::NewDB() {
   }
   delete file;
   if (s.ok()) {
+    // NOTE:让CURRENT文件指向这个MANIFEST文件
     // Make "CURRENT" file that points to the new manifest file.
     s = SetCurrentFile(env_, dbname_, 1);
   } else {
@@ -289,20 +300,25 @@ void DBImpl::RemoveObsoleteFiles() {
   mutex_.Lock();
 }
 
+/** NOTE:Open一个数据库时主要的函数 
+*/
 Status DBImpl::Recover(VersionEdit* edit, bool* save_manifest) {
   mutex_.AssertHeld();
 
+  // NOTE:创建数据库目录
   // Ignore error from CreateDir since the creation of the DB is
   // committed only when the descriptor is created, and this directory
   // may already exist from a previous failed creation attempt.
   env_->CreateDir(dbname_);
   assert(db_lock_ == nullptr);
+  // NOTE:加文件锁,防止其他进程进入
   Status s = env_->LockFile(LockFileName(dbname_), &db_lock_);
   if (!s.ok()) {
     return s;
   }
 
   if (!env_->FileExists(CurrentFileName(dbname_))) {
+    // NOTE:如果CURRENT文件不存在,说明需要新创建数据库
     if (options_.create_if_missing) {
       Log(options_.info_log, "Creating DB %s since it was missing.",
           dbname_.c_str());
@@ -321,12 +337,17 @@ Status DBImpl::Recover(VersionEdit* edit, bool* save_manifest) {
     }
   }
 
+  // NOTE:读取MANIFEST文件进行版本信息的恢复
   s = versions_->Recover(save_manifest);
   if (!s.ok()) {
     return s;
   }
   SequenceNumber max_sequence(0);
 
+  /** NOTE:之前的MANIFEST恢复,会得到版本信息,里面包含了之前的log number
+   * 搜索文件系统里的log,如果这些日志的编号>=这个log number,那么这些
+   * 日志都是关闭时丢失的数据,需要恢复,这里将日志按顺序存储在logs里面
+  */
   // Recover from all newer log files than the ones named in the
   // descriptor (new log files may have been added by the previous
   // incarnation without registering them in the descriptor).
@@ -360,6 +381,7 @@ Status DBImpl::Recover(VersionEdit* edit, bool* save_manifest) {
     return Status::Corruption(buf, TableFileName(dbname_, *(expected.begin())));
   }
 
+  // NOTE:逐个恢复日志的内容
   // Recover in the order in which the logs were generated
   std::sort(logs.begin(), logs.end());
   for (size_t i = 0; i < logs.size(); i++) {
@@ -1480,6 +1502,11 @@ Status DB::Delete(const WriteOptions& opt, const Slice& key) {
 
 DB::~DB() = default;
 
+/** NOTE:外部接口 
+ * 打开数据库的入口函数
+ * 调用DBImpl::Recover来完成主要的工作,如果调用成功,
+ * 则创建MemTable和WAL相关的数据结构,重写MANIFEST文件
+ */
 Status DB::Open(const Options& options, const std::string& dbname, DB** dbptr) {
   *dbptr = nullptr;
 
@@ -1488,14 +1515,19 @@ Status DB::Open(const Options& options, const std::string& dbname, DB** dbptr) {
   VersionEdit edit;
   // Recover handles create_if_missing, error_if_exists
   bool save_manifest = false;
+  // NOTE:调用DBImpl::Recover完成MANIFEST的加载和故障恢复
   Status s = impl->Recover(&edit, &save_manifest);
   if (s.ok() && impl->mem_ == nullptr) {
+    // NOTE:创建日志和相应的MemTable
     // Create new log and a corresponding memtable.
     uint64_t new_log_number = impl->versions_->NewFileNumber();
     WritableFile* lfile;
     s = options.env->NewWritableFile(LogFileName(dbname, new_log_number),
                                      &lfile);
     if (s.ok()) {
+      /** NOTE:如果需要重写MANIFEST文件,那么做一个版本变更,这里面会创建一个新的MANIFEST
+       * 将当前的版本信息写入,然后将edit的内容写入.
+       * */
       edit.SetLogNumber(new_log_number);
       impl->logfile_ = lfile;
       impl->logfile_number_ = new_log_number;

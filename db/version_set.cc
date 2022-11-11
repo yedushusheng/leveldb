@@ -859,6 +859,10 @@ Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
   return s;
 }
 
+/** NOTE:
+ * VersionSet::Recover完成MANIFEST文件的读取和版本的构造,
+ * 需要知道数据库里有哪些SSTable文件,每个文件处于哪个Level,当前日志的编号等等信息
+*/
 Status VersionSet::Recover(bool* save_manifest) {
   struct LogReporter : public log::Reader::Reporter {
     Status* status;
@@ -866,6 +870,9 @@ Status VersionSet::Recover(bool* save_manifest) {
       if (this->status->ok()) *this->status = s;
     }
   };
+
+  // NOTE:读取CURRENT文件的内容,获取当前使用的MANIFEST文件
+  // NOTE:读取MANIFEST文件,将里面的VersionEdit读取应用到一个builder里
 
   // Read "CURRENT" file, which contains a pointer to the current manifest file
   std::string current;
@@ -966,11 +973,11 @@ Status VersionSet::Recover(bool* save_manifest) {
   }
 
   if (s.ok()) {
-    Version* v = new Version(this);
-    builder.SaveTo(v);
+    Version* v = new Version(this); // NOTE:创建一个新版本版本
+    builder.SaveTo(v);  // NOTE:将builder里面的内容应用到新版本里
     // Install recovered version
-    Finalize(v);
-    AppendVersion(v);
+    Finalize(v);  // NOTE:更新Size Compaction的统计信息
+    AppendVersion(v); // NOTE:安装新版本成为当前版本
     manifest_file_number_ = next_file;
     next_file_number_ = next_file + 1;
     last_sequence_ = last_sequence;
@@ -979,6 +986,11 @@ Status VersionSet::Recover(bool* save_manifest) {
 
     // See if we can reuse the existing MANIFEST file.
     if (ReuseManifest(dscname, current)) {
+      /** NOTE:如果MANIFEST可以重用,那么不需要保存MANIFEST
+       * 这里主要判断MANIFEST的大小,如果大于2M,那么就不会重用MANIFEST文件,
+       * 而是将当前状态写入到一个新的MANIFEST文件里,这样可以避免打开的时候读取
+       * 太大的MANINFEST,使得打开时间太长
+      */
       // No need to save new manifest
     } else {
       *save_manifest = true;

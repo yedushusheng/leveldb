@@ -11,7 +11,8 @@
 #include "leveldb/iterator.h"
 
 /** NOTE:
- * table/block.h table/block.cc: 对一个Block进行读取相关的功能
+ * table/block.h 
+ * table/block.cc: 对一个Block进行读取相关的功能
 */
 namespace leveldb {
 
